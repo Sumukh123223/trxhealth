@@ -1,0 +1,92 @@
+# TronFlash Dashboard - Git Ignore File
+
+# Sensitive Configuration Files
+config.local.js
+config.prod.js
+.env
+.env.local
+.env.production
+
+# Private Keys and Sensitive Data
+private-keys.txt
+wallet-keys.json
+secrets.json
+
+# Logs
+*.log
+logs/
+error.log
+access.log
+
+# Temporary Files
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# IDE Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node Modules (if using build tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build Output
+dist/
+build/
+out/
+
+# Cache
+.cache/
+.parcel-cache/
+
+# Backup Files
+*.bak
+*.backup
+*.old
+
+# OS Generated Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Analytics Data (if storing locally)
+analytics-data.json
+user-data.json
+transaction-data.json
+
+# Test Files
+test/
+tests/
+*.test.js
+*.spec.js
+
+# Documentation Build
+docs/build/
+docs/_build/
+
+# Deployment Files
+deploy/
+deployment/
+*.zip
+*.tar.gz
+*.rar
+
+# Local Development
+local/
+dev/
+development/
+
+# Production Overrides
+production/
+prod/

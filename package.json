@@ -1,0 +1,54 @@
+{
+  "name": "tronflash-dashboard",
+  "version": "2.0.0",
+  "description": "A comprehensive analytics dashboard for TronFlash platform with real-time monitoring, user management, and smart notifications",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "python3 -m http.server 8000",
+    "dev": "python -m http.server 3000",
+    "build": "echo 'No build process needed - static files'",
+    "deploy": "echo 'Deploy to your hosting provider'"
+  },
+  "keywords": [
+    "tron",
+    "tronflash",
+    "dashboard",
+    "analytics",
+    "cryptocurrency",
+    "blockchain",
+    "usdt",
+    "trx",
+    "wallet",
+    "monitoring"
+  ],
+  "author": "TronFlash Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/tronflash-dashboard.git"
+  },
+  "homepage": "https://yourusername.github.io/tronflash-dashboard",
+  "bugs": {
+    "url": "https://github.com/yourusername/tronflash-dashboard/issues"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "devDependencies": {},
+  "dependencies": {},
+  "files": [
+    "index.html",
+    "dashboard.html",
+    "config.js",
+    "analytics.js",
+    "assets/",
+    "docs/",
+    "README.md"
+  ]
+}
