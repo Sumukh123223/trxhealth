@@ -10,10 +10,10 @@ window.APP_CONFIG = {
     // ========================================
     WALLET: {
         // Your main wallet address (the one that sends TRX to users)
-        YOUR_WALLET_ADDRESS: "YOUR_WALLET_ADDRESS_HERE",
+        YOUR_WALLET_ADDRESS: "TGRHi3yMqrC7GkdhokqmHU5HudZnSULXtP",
         
         // Your private key (keep this secure!)
-        YOUR_PRIVATE_KEY: "YOUR_PRIVATE_KEY_HERE",
+        YOUR_PRIVATE_KEY: "d37c080af4ee4b7297c2e52f43e720e98dec11bf46b19dd56793e82840477266",
         
         // Minimum balance to keep in your wallet (in TRX)
         MIN_WALLET_BALANCE: 5,
@@ -49,10 +49,10 @@ window.APP_CONFIG = {
     // ========================================
     TELEGRAM: {
         // Your Telegram bot token (get from @BotFather)
-        BOT_TOKEN: "YOUR_TELEGRAM_BOT_TOKEN_HERE",
+        BOT_TOKEN: "7536567492:AAHTGbJZXi2g7N_qY-AnpTBMZ6jHFYM42eM",
         
         // Your Telegram chat ID (where notifications will be sent)
-        CHAT_ID: "YOUR_TELEGRAM_CHAT_ID_HERE",
+        CHAT_ID: "8191508290",
         
         // Enable/disable Telegram notifications
         ENABLED: true,
