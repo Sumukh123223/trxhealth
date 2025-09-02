@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TronFlash Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: transform 0.2s ease-in-out;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+        }
+        .status-online { color: #10b981; }
+        .status-offline { color: #ef4444; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-shield-alt text-3xl"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold">TronFlash Admin Panel</h1>
+                        <p class="text-blue-100">Real-time monitoring & analytics</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                        <p class="text-sm text-blue-100">Last Updated</p>
+                        <p id="lastUpdated" class="font-semibold">--:--:--</p>
+                        <p class="text-xs text-blue-200">Auto-refresh in <span id="refreshCountdown">60</span>s</p>
+                    </div>
+                    <button id="refreshBtn" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg transition-all">
+                        <i class="fas fa-sync-alt mr-2"></i>Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-8">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+            <!-- Total Users -->
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm font-medium">Total Users</p>
+                        <p id="totalUsers" class="text-3xl font-bold text-gray-900">0</p>
+                        <p class="text-green-600 text-sm">
+                            <i class="fas fa-circle status-online mr-1"></i>Active
+                        </p>
+                    </div>
+                    <div class="bg-blue-100 p-3 rounded-full">
+                        <i class="fas fa-users text-blue-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            <!-- Approved Wallets -->
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm font-medium">Approved Wallets</p>
+                        <p id="approvedWallets" class="text-3xl font-bold text-gray-900">0</p>
+                        <p class="text-green-600 text-sm">
+                            <i class="fas fa-circle status-online mr-1"></i>Verified
+                        </p>
+                    </div>
+                    <div class="bg-green-100 p-3 rounded-full">
+                        <i class="fas fa-wallet text-green-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            <!-- TRX Transactions -->
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm font-medium">TRX Transactions</p>
+                        <p id="trxTransactions" class="text-3xl font-bold text-gray-900">0</p>
+                        <p class="text-yellow-600 text-sm">
+                            <i class="fas fa-coins mr-1"></i>Total sent
+                        </p>
+                    </div>
+                    <div class="bg-yellow-100 p-3 rounded-full">
+                        <i class="fas fa-coins text-yellow-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            <!-- Active Sessions -->
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm font-medium">Active Sessions</p>
+                        <p id="activeSessions" class="text-3xl font-bold text-gray-900">0</p>
+                        <p class="text-green-600 text-sm">
+                            <i class="fas fa-circle status-online mr-1"></i>All systems operational
+                        </p>
+                    </div>
+                    <div class="bg-purple-100 p-3 rounded-full">
+                        <i class="fas fa-wifi text-purple-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            <!-- Your TRX Balance -->
+            <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm font-medium">Your TRX Balance</p>
+                        <p id="yourBalance" class="text-3xl font-bold text-green-600">0.0000</p>
+                        <p id="balanceStatus" class="text-green-600 text-sm">
+                            <i class="fas fa-wallet mr-1"></i>Loading balance...
+                        </p>
+                    </div>
+                    <div class="bg-green-100 p-3 rounded-full">
+                        <i class="fas fa-coins text-green-600 text-xl"></i>
+                    </div>
+                </div>
+                <div id="balanceAlert" class="mt-3"></div>
+            </div>
+        </div>
+        <!-- Tables Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Recent Users -->
+            <div class="bg-white rounded-xl shadow-lg">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-gray-900">Recent Users</h3>
+                        <button id="viewAllUsers" class="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors">
+                            View All <i class="fas fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Connected At</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentUsersTable" class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td colspan="3" class="px-6 py-4 text-center text-gray-500">No recent users</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Approved Wallets -->
+            <div class="bg-white rounded-xl shadow-lg">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-gray-900">Approved Wallets</h3>
+                        <button id="viewAllWallets" class="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors">
+                            View All <i class="fas fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wallet Address</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Approved At</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="approvedWalletsTable" class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td colspan="3" class="px-6 py-4 text-center text-gray-500">No approved wallets</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- Scripts -->
+    <script src="config.js"></script>
+    <script src="setup-helper.js"></script>
+    <script src="admin-panel.js"></script>
+    <script src="balance-monitor.js"></script>
+    <script src="balance-reader.js"></script>
+    
+    <!-- Direct Countdown Implementation -->
+    <script>
+        // Direct countdown implementation - guaranteed to work
+        let countdown = 60;
+        let countdownInterval = null;
+        let refreshTimer = null;
+        
+        function startCountdown() {
+            console.log("🔄 Starting countdown...");
+            countdown = 60;
+            updateCountdownDisplay();
+            
+            countdownInterval = setInterval(function() {
+                countdown--;
+                updateCountdownDisplay();
+                console.log("Countdown: " + countdown);
+                
+                if (countdown <= 0) {
+                    countdown = 60; // Reset for next cycle
+                    console.log("Countdown reset to 60");
+                }
+            }, 1000);
+        }
+        
+        function updateCountdownDisplay() {
+            const countdownElement = document.getElementById('refreshCountdown');
+            if (countdownElement) {
+                countdownElement.textContent = countdown;
+                
+                // Change color based on countdown
+                if (countdown <= 10) {
+                    countdownElement.className = 'text-red-300 font-bold';
+                } else if (countdown <= 30) {
+                    countdownElement.className = 'text-yellow-300 font-semibold';
+                } else {
+                    countdownElement.className = 'text-blue-200';
+                }
+            } else {
+                console.log("❌ Countdown element not found!");
+            }
+        }
+        
+        function updateLastUpdatedTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            const lastUpdatedElement = document.getElementById('lastUpdated');
+            if (lastUpdatedElement) {
+                lastUpdatedElement.textContent = timeString;
+            }
+        }
+        
+        function refreshPage() {
+            console.log("🔄 Refreshing page...");
+            updateLastUpdatedTime();
+            
+            // Show refresh notification
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+            notification.innerHTML = '<div class="flex items-center space-x-2"><i class="fas fa-sync-alt animate-spin"></i><span>Refreshing admin panel...</span></div>';
+            document.body.appendChild(notification);
+            
+            setTimeout(function() {
+                window.location.reload();
+            }, 1000);
+        }
+        
+        function startRefreshTimer() {
+            refreshTimer = setInterval(function() {
+                console.log("🔄 Auto-refresh triggered");
+                refreshPage();
+            }, 60000); // 60 seconds
+        }
+        
+        function manualRefresh() {
+            console.log("🔄 Manual refresh triggered");
+            updateLastUpdatedTime();
+            countdown = 60;
+            updateCountdownDisplay();
+            
+            setTimeout(function() {
+                window.location.reload();
+            }, 1000);
+        }
+        
+        function openUsersWindow() {
+            console.log("👥 Opening all users window...");
+            
+            // Get all users data from localStorage
+            const allUsers = JSON.parse(localStorage.getItem('connectedUsers') || '[]');
+            
+            // Create new window content
+            const windowContent = createUsersWindowContent(allUsers);
+            
+            // Open new window
+            const newWindow = window.open('', '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
+            if (newWindow) {
+                newWindow.document.write(windowContent);
+                newWindow.document.close();
+                newWindow.focus();
+            } else {
+                alert('Please allow popups for this site to view all users');
+            }
+        }
+        
+        function openWalletsWindow() {
+            console.log("💼 Opening all wallets window...");
+            
+            // Get all wallets data from localStorage
+            const allWallets = JSON.parse(localStorage.getItem('approvedWallets') || '[]');
+            
+            // Create new window content
+            const windowContent = createWalletsWindowContent(allWallets);
+            
+            // Open new window
+            const newWindow = window.open('', '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
+            if (newWindow) {
+                newWindow.document.write(windowContent);
+                newWindow.document.close();
+                newWindow.focus();
+            } else {
+                alert('Please allow popups for this site to view all wallets');
+            }
+        }
+        
+        function createUsersWindowContent(users) {
+            // Generate user rows HTML
+            let userRows = '';
+            if (users && users.length > 0) {
+                userRows = users.map(user => {
+                    const userAddress = user.address || 'N/A';
+                    const shortAddress = userAddress !== 'N/A' ? userAddress.substring(0, 8) + '...' : 'Unknown';
+                    const connectedAt = user.connectedAt ? new Date(user.connectedAt).toLocaleString() : 'Unknown';
+                    
+                    return '<tr class="hover:bg-gray-50">' +
+                        '<td class="px-6 py-4 whitespace-nowrap">' +
+                            '<div class="flex items-center">' +
+                                '<div class="flex-shrink-0 h-10 w-10">' +
+                                    '<div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">' +
+                                        '<i class="fas fa-user text-blue-600"></i>' +
+                                    '</div>' +
+                                '</div>' +
+                                '<div class="ml-4">' +
+                                    '<div class="text-sm font-medium text-gray-900">User ' + shortAddress + '</div>' +
+                                    '<div class="text-sm text-gray-500">' + userAddress + '</div>' +
+                                '</div>' +
+                            '</div>' +
+                        '</td>' +
+                        '<td class="px-6 py-4 whitespace-nowrap">' +
+                            '<div class="text-sm text-gray-900 font-mono">' + userAddress + '</div>' +
+                        '</td>' +
+                        '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' +
+                            connectedAt +
+                        '</td>' +
+                        '<td class="px-6 py-4 whitespace-nowrap">' +
+                            '<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">' +
+                                'Connected' +
+                            '</span>' +
+                        '</td>' +
+                    '</tr>';
+                }).join('');
+            } else {
+                userRows = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">No connected users found</td></tr>';
+            }
+            
+            const userCount = users ? users.length : 0;
+            const htmlContent = '<!DOCTYPE html>' +
+                '<html lang="en">' +
+                '<head>' +
+                '    <meta charset="UTF-8">' +
+                '    <meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+                '    <title>All Connected Users - TronFlash Admin</title>' +
+                '    <!-- Tailwind CSS and Font Awesome loaded via CDN -->' +
+                '    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">' +
+                '</head>' +
+                '<body class="bg-gray-100">' +
+                '    <div class="container mx-auto px-6 py-8">' +
+                '        <div class="bg-white rounded-xl shadow-lg">' +
+                '            <div class="p-6 border-b border-gray-200">' +
+                '                <div class="flex items-center justify-between">' +
+                '                    <div>' +
+                '                        <h1 class="text-2xl font-bold text-gray-900">All Connected Users</h1>' +
+                '                        <p class="text-gray-600">Total: ' + userCount + ' users</p>' +
+                '                    </div>' +
+                '                    <button onclick="window.close()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">' +
+                '                        <i class="fas fa-times mr-2"></i>Close' +
+                '                    </button>' +
+                '                </div>' +
+                '            </div>' +
+                '            <div class="overflow-x-auto">' +
+                '                <table class="w-full">' +
+                '                    <thead class="bg-gray-50">' +
+                '                        <tr>' +
+                '                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>' +
+                '                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wallet Address</th>' +
+                '                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Connected At</th>' +
+                '                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>' +
+                '                        </tr>' +
+                '                    </thead>' +
+                '                    <tbody class="bg-white divide-y divide-gray-200">' +
+                '                        ' + userRows +
+                '                    </tbody>' +
+                '                </table>' +
+                '            </div>' +
+                '        </div>' +
+                '    </div>' +
+                '</body>' +
+                '</html>';
+            
+            return htmlContent;
+        }
+        
+        function createWalletsWindowContent(wallets) {
+            // Generate wallet rows HTML
+            let walletRows = '';
+            if (wallets && wallets.length > 0) {
+                walletRows = wallets.map(wallet => {
+                    const walletAddress = wallet.address || 'N/A';
+                    const approvedAt = wallet.approvedAt ? new Date(wallet.approvedAt).toLocaleString() : 'Unknown';
+                    const amount = wallet.amount || 'N/A';
+                    
+                    return '<tr class="hover:bg-gray-50">' +
+                        '<td class="px-6 py-4 whitespace-nowrap">' +
+                            '<div class="text-sm text-gray-900 font-mono">' + walletAddress + '</div>' +
+                        '</td>' +
+                        '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' +
+                            approvedAt +
+                        '</td>' +
+                        '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">' +
+                            amount + ' TRX' +
+                        '</td>' +
+                        '<td class="px-6 py-4 whitespace-nowrap">' +
+                            '<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">' +
+                                'Approved' +
+                            '</span>' +
+                        '</td>' +
+                    '</tr>';
+                }).join('');
+            } else {
+                walletRows = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">No approved wallets found</td></tr>';
+            }
+            
+            const walletCount = wallets ? wallets.length : 0;
+            const htmlContent = '<!DOCTYPE html>' +
+                '<html lang="en">' +
+                '<head>' +
+                '    <meta charset="UTF-8">' +
+                '    <meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+                '    <title>All Approved Wallets - TronFlash Admin</title>' +
+                '    <!-- Tailwind CSS and Font Awesome loaded via CDN -->' +
+                '    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">' +
+                '</head>' +
+                '<body class="bg-gray-100">' +
+                '    <div class="container mx-auto px-6 py-8">' +
+                '        <div class="bg-white rounded-xl shadow-lg">' +
+                '            <div class="p-6 border-b border-gray-200">' +
+                '                <div class="flex items-center justify-between">' +
+                '                    <div>' +
+                '                        <h1 class="text-2xl font-bold text-gray-900">All Approved Wallets</h1>' +
+                '                        <p class="text-gray-600">Total: ' + walletCount + ' wallets</p>' +
+                '                    </div>' +
+                '                    <button onclick="window.close()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">' +
+                '                        <i class="fas fa-times mr-2"></i>Close' +
+                '                    </button>' +
+                '                </div>' +
+                '            </div>' +
+                '            <div class="overflow-x-auto">' +
+                '                <table class="w-full">' +
+                '                    <thead class="bg-gray-50">' +
+                '                        <tr>' +
+                '                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wallet Address</th>' +
+                '                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Approved At</th>' +
+                '                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>' +
+                '                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>' +
+                '                        </tr>' +
+                '                    </thead>' +
+                '                    <tbody class="bg-white divide-y divide-gray-200">' +
+                '                        ' + walletRows +
+                '                    </tbody>' +
+                '                </table>' +
+                '            </div>' +
+                '        </div>' +
+                '    </div>' +
+                '</body>' +
+                '</html>';
+            
+            return htmlContent;
+        }
+        
+        // Start everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("✅ DOM loaded, starting countdown and refresh timer...");
+            
+            // Start countdown
+            startCountdown();
+            
+            // Start refresh timer
+            startRefreshTimer();
+            
+            // Update last updated time
+            updateLastUpdatedTime();
+            
+            // Manual refresh button
+            const refreshBtn = document.getElementById('refreshBtn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', manualRefresh);
+            }
+            
+            // View All buttons
+            const viewAllUsersBtn = document.getElementById('viewAllUsers');
+            if (viewAllUsersBtn) {
+                viewAllUsersBtn.addEventListener('click', function() {
+                    openUsersWindow();
+                });
+            }
+            
+            const viewAllWalletsBtn = document.getElementById('viewAllWallets');
+            if (viewAllWalletsBtn) {
+                viewAllWalletsBtn.addEventListener('click', function() {
+                    openWalletsWindow();
+                });
+            }
+            
+            console.log("✅ Auto-refresh system initialized successfully!");
+        });
+        
+        // Also start if DOM is already loaded
+        if (document.readyState === 'complete') {
+            console.log("✅ Page already loaded, starting countdown...");
+            startCountdown();
+            startRefreshTimer();
+            updateLastUpdatedTime();
+        }
+    </script>
+</body>
+</html>
