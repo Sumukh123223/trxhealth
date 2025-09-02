@@ -90,3 +90,4 @@ development/
 # Production Overrides
 production/
 prod/
+.vercel
